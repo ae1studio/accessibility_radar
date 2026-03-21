@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:accessibility_radar/features/radar/presentation/appt_resources.dart';
-import 'package:accessibility_radar/features/radar/radar_scanner_tab.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/appt_resources.dart';
+import 'package:accessibility_radar/src/features/radar/radar_scanner_tab.dart';
 import 'package:flutter/material.dart';
 
 class RadarHome extends StatelessWidget {

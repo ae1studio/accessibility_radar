@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:accessibility_radar/features/radar/data/inspector_bridge.dart';
-import 'package:accessibility_radar/features/radar/domain/tree_scanner.dart';
-import 'package:accessibility_radar/features/radar/presentation/hit_list_filter.dart';
-import 'package:accessibility_radar/features/radar/presentation/widgets/hit_tile.dart';
-import 'package:accessibility_radar/features/radar/presentation/widgets/semantic_hint_message_body.dart';
-import 'package:accessibility_radar/features/radar/presentation/widgets/wcag_hint_header.dart';
+import 'package:accessibility_radar/src/features/radar/data/inspector_bridge.dart';
+import 'package:accessibility_radar/src/features/radar/domain/tree_scanner.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/hit_list_filter.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/widgets/hit_tile.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/widgets/semantic_hint_message_body.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/widgets/wcag_hint_header.dart';
 import 'package:devtools_app_shared/service.dart';
 import 'package:devtools_app_shared/service_extensions.dart' as extensions;
 import 'package:devtools_app_shared/utils.dart';

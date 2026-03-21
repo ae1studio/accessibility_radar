@@ -1,4 +1,4 @@
-import 'package:accessibility_radar/features/radar_shell/presentation/radar_home.dart';
+import 'package:accessibility_radar/src/features/radar_shell/presentation/radar_home.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
 import 'package:flutter/material.dart';
 
