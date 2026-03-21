@@ -1,0 +1,27 @@
+name: accessibility_radar
+description: "Flutter DevTools extension that scans the live widget tree for accessibility: Semantics and related widgets, plus focus and keyboard plumbing."
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  devtools_extensions: ^0.5.0
+  devtools_app_shared: ^0.5.0
+  vm_service: ^15.0.2
+  url_launcher: ^6.3.2
+  flutter_highlight: ^0.7.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

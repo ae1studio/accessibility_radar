@@ -1,0 +1,7 @@
+# DevTools extension metadata — see:
+# https://github.com/flutter/devtools/blob/master/packages/devtools_extensions/extension_config_spec.md
+name: accessibility_radar
+issueTracker: https://github.com/ae1studio/accessibility_radar/issues
+version: 0.1.0
+materialIconCodePoint: "0xe03c"
+requiresConnection: true
