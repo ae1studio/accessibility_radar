@@ -71,19 +71,22 @@ class _SemanticHintChunk extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             border: Border.all(
               color: scheme.outlineVariant.withValues(alpha: 0.55),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: SelectionArea(
-            child: HighlightView(
-              parts.dartExample!,
-              language: 'dart',
-              theme: hlTheme,
-              textStyle: const TextStyle(fontSize: 12.5, height: 1.45),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SelectionArea(
+              child: HighlightView(
+                parts.dartExample!,
+                language: 'dart',
+                theme: hlTheme,
+                padding: const EdgeInsets.all(8),
+                textStyle: const TextStyle(fontSize: 12.5, height: 1.45),
+              ),
             ),
           ),
         ),
