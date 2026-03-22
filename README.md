@@ -1,8 +1,8 @@
 # Accessibility Radar
 
-Flutter DevTools extension that scans the live widget tree for semantics, and accessibility related widgets (`Semantics`, focus, shortcuts, and similar), optional **WCAG-oriented** hints, and structural **warnings**.
+Flutter DevTools extension that scans the live widget tree for semantics, and accessibility related widgets (Semantics, focus, shortcuts, and similar), optional **WCAG-oriented** hints, and structural warnings.
 
-The scan reflects what is on screen in the running app, not the file open in your editor. Hints are **heuristics** confirm with your own review or audit.
+The scan reflects what is on screen in the running app, not the file open in your editor. Hints are heuristics confirm with your own review or audit.
 
 Resources: [APPT Accessibility Handbook (PDF)](https://appt.org/en/pdf/appt-accessibility-handbook.pdf) · [appt.org](https://appt.org/)
 
@@ -14,7 +14,7 @@ Add as a **dev dependency** (match the version on [pub.dev](https://pub.dev/pack
 
 ```yaml
 dev_dependencies:
-  accessibility_radar: ^0.1.0
+  accessibility_radar: latest
 ```
 
 ```bash
