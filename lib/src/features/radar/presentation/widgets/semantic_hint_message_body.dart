@@ -1,4 +1,5 @@
 import 'package:accessibility_radar/src/features/radar/domain/tree_scanner.dart';
+import 'package:accessibility_radar/src/features/radar/presentation/appt_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlight/themes/atom-one-dark.dart';
@@ -69,24 +70,37 @@ class _SemanticHintChunk extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: scheme.outlineVariant.withValues(alpha: 0.55),
-              ),
-              borderRadius: BorderRadius.circular(8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.55),
             ),
-            child: SelectionArea(
-              child: HighlightView(
-                parts.dartExample!,
-                language: 'dart',
-                theme: hlTheme,
-                textStyle: const TextStyle(fontSize: 12.5, height: 1.45),
-              ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: SelectionArea(
+            child: HighlightView(
+              parts.dartExample!,
+              language: 'dart',
+              theme: hlTheme,
+              textStyle: const TextStyle(fontSize: 12.5, height: 1.45),
             ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () => openAccessibilityHandbookUrl(
+              Uri.parse(kApptFlutterSamplesDocs),
+            ),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: scheme.primary,
+            ),
+            child: const Text('Flutter accessibility code samples (Appt)'),
           ),
         ),
       ],

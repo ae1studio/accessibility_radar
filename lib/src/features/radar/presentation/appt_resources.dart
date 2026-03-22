@@ -5,6 +5,9 @@ const String kApptOrg = 'https://appt.org/';
 const String kApptHandbookPdf =
     'https://appt.org/en/pdf/appt-accessibility-handbook.pdf';
 
+const String kApptFlutterSamplesDocs =
+    'https://appt.org/en/docs/flutter/samples';
+
 Future<void> openAccessibilityHandbookUrl(Uri uri) async {
   if (await url_launcher.canLaunchUrl(uri)) {
     await url_launcher.launchUrl(
