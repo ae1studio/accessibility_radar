@@ -1,10 +1,12 @@
 # Accessibility Radar
 
-Flutter DevTools extension that scans the live widget tree for semantics, and accessibility related widgets (`Semantics`, focus, shortcuts, and similar), optional **WCAG-oriented** hints, and structural **warnings**. When the VM provides them, results can include source file, and line.
+Flutter DevTools extension that scans the live widget tree for semantics, and accessibility related widgets (`Semantics`, focus, shortcuts, and similar), optional **WCAG-oriented** hints, and structural **warnings**.
 
 The scan reflects what is on screen in the running app, not the file open in your editor. Hints are **heuristics** confirm with your own review or audit.
 
 Resources: [APPT Accessibility Handbook (PDF)](https://appt.org/en/pdf/appt-accessibility-handbook.pdf) · [appt.org](https://appt.org/)
+
+![Accessibility Radar DevTools extension](docs/media/demo.png)
 
 ## Use in your app
 
@@ -25,7 +27,7 @@ Run the app in **debug** or **profile**, open DevTools, enable the extension if 
 
 ### Build the extension (`extension/devtools`)
 
-From the **repository root**, after UI or dependency changes:
+From the root, after UI or dependency changes:
 
 ```bash
 flutter pub get
@@ -41,7 +43,7 @@ cd example
 flutter run
 ```
 
-Rebuild the extension when you change the DevTools UI, then in DevTools open **accessibility_radar** and run **Scan widget tree**.
+Rebuild the extension when you change the DevTools UI, then in DevTools open **accessibility_radar** and press the Scan button.
 
 ### Test UI in Chrome
 
