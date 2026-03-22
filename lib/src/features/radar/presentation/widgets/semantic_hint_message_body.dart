@@ -71,7 +71,8 @@ class _SemanticHintChunk extends StatelessWidget {
         const SizedBox(height: 4),
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: DecoratedBox(
+          child: Container(
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               border: Border.all(
                 color: scheme.outlineVariant.withValues(alpha: 0.55),
