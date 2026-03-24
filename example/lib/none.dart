@@ -1,8 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-/// Deliberately avoids [Semantics], [MergeSemantics], [ExcludeSemantics],
-/// [FocusTraversalGroup], and similar so Accessibility Radar can suggest fixes.
+/// Intentionally plain: no [Semantics], [MergeSemantics], [ExcludeSemantics], or focus groups; good for demo scans.
 class NoAccessibilityDemoPage extends StatefulWidget {
   const NoAccessibilityDemoPage({super.key});
 

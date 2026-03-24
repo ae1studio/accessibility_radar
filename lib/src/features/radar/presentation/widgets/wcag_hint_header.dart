@@ -20,8 +20,7 @@ class WcagHintHeader extends StatelessWidget {
           if (i > 0) const SizedBox(height: 10),
           Tooltip(
             message:
-                '${hints[i].wcagFullLabel}. '
-                'Use the APPT Accessibility Handbook alongside the official WCAG 2.1 docs when implementing fixes.',
+                '${hints[i].wcagFullLabel}. See the APPT handbook and WCAG 2.1 for fixes.',
             child: Wrap(
               spacing: 6,
               runSpacing: 4,

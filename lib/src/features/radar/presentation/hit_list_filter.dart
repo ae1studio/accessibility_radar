@@ -1,15 +1,15 @@
-/// What to show in the hit list: everything, inspector “found” rows only, hints, or semantic warnings.
+/// Which rows the hit list shows.
 enum HitListFilter {
-  /// Semantics + focus primitives and WCAG hints.
+  /// Semantics, focus, hints, and warnings.
   all,
 
-  /// Rows from the tree that match semantics/focus heuristics (not hint suggestions).
+  /// Semantics/focus hits only (no hint rows).
   foundOnly,
 
-  /// WCAG heuristic hints only.
+  /// WCAG-style hints only.
   hintsOnly,
 
-  /// Structural / best-practice semantic warnings only.
+  /// Structural warnings only.
   warningsOnly,
 }
 
@@ -22,12 +22,9 @@ extension HitListFilterUi on HitListFilter {
   };
 
   String get tooltip => switch (this) {
-    HitListFilter.all =>
-      'Show semantics/focus matches, WCAG hints, and semantic warnings',
-    HitListFilter.foundOnly =>
-      'Show only widgets matched as Semantics/focus primitives (exclude hint rows)',
-    HitListFilter.hintsOnly => 'Show only WCAG-style heuristic hints',
-    HitListFilter.warningsOnly =>
-      'Show only rows with semantic structure warnings (nested MergeSemantics, etc.)',
+    HitListFilter.all => 'Semantics, focus, hints, and warnings',
+    HitListFilter.foundOnly => 'Semantics and focus matches only',
+    HitListFilter.hintsOnly => 'WCAG-style hints only',
+    HitListFilter.warningsOnly => 'Structure warnings only (e.g. MergeSemantics)',
   };
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:devtools_app_shared/service.dart';
 
+/// `ext.flutter.inspector.*` calls for the connected isolate.
 class InspectorBridge {
   InspectorBridge(this._serviceManager);
 

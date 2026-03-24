@@ -8,6 +8,7 @@ const String kApptHandbookPdf =
 const String kApptFlutterSamplesDocs =
     'https://appt.org/en/docs/flutter/samples';
 
+/// Opens [uri] in an external browser when allowed.
 Future<void> openAccessibilityHandbookUrl(Uri uri) async {
   if (await url_launcher.canLaunchUrl(uri)) {
     await url_launcher.launchUrl(

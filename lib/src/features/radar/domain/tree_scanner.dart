@@ -187,9 +187,7 @@ class AccessibilityHit {
         'WCAG 2.1 Level ${h.wcagLevel}: ${h.criterionId} ${h.criterionName}.',
       );
     }
-    buf.write(
-      'Use the APPT Accessibility Handbook alongside the official WCAG 2.1 docs when implementing fixes.',
-    );
+    buf.write('See the APPT handbook and WCAG 2.1 when fixing issues.');
     return buf.toString();
   }
 

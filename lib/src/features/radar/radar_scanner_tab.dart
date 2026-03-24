@@ -166,10 +166,7 @@ class _RadarScannerTabState extends State<RadarScannerTab>
     }
   }
 
-  /// Turns on the Flutter on-device widget inspector overlay (`ext.flutter.inspector.show`).
-  ///
-  /// Note: `ext.flutter.inspector.enable` is not registered by the framework; DevTools uses
-  /// [extensions.toggleOnDeviceWidgetInspector] for the real overlay.
+  /// Enables the on-device inspector overlay via [extensions.toggleOnDeviceWidgetInspector].
   Future<void> _ensureInspectorOverlay() async {
     final mgr = serviceManager.serviceExtensionManager;
     final toggle = extensions.toggleOnDeviceWidgetInspector;
