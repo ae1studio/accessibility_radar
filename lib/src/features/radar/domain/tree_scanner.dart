@@ -1,4 +1,4 @@
-/// WCAG 2.1-oriented metadata for a [SemanticGapHint] (aligned with common handbook mappings).
+/// WCAG 2.1 fields for a [SemanticGapHint].
 class SemanticGapHint {
   const SemanticGapHint({
     required this.message,
@@ -19,7 +19,7 @@ class SemanticGapHint {
   /// Short criterion title, e.g. `Non-text Content`.
   final String criterionName;
 
-  /// Tooltip / screen-reader friendly line.
+  /// Tooltip / screen reader line.
   String get wcagFullLabel =>
       'WCAG 2.1 Level $wcagLevel: $criterionId $criterionName';
 }
@@ -38,12 +38,11 @@ class SemanticWarning {
 
 const String kAccessibilityHintExampleSeparator = '\n\nExample:\n';
 
-/// Injected by the scanner tab using [ext.flutter.inspector.getProperties], because
-/// [getRootWidgetTree] omits `properties` and node `description` is only `Widget#hash`.
+/// Extra inspector text from [ext.flutter.inspector.getProperties]; the tree summary often omits `properties`.
 const String kAccessibilityInspectorPropertyTextKey =
     'accessibilityRadar.inspectorPropertyText';
 
-/// Flattens [InspectorBridge.getProperties] JSON for substring heuristics.
+/// Walks getProperties JSON and appends descriptions into one string.
 String flattenInspectorPropertyDescriptions(Object? raw) {
   final StringBuffer buf = StringBuffer();
   void walk(Object? node) {
@@ -97,7 +96,7 @@ String accessibilityHeuristicInspectorText(
   );
 }
 
-/// A flattened inspector node that matters for accessibility review.
+/// One row in the scan results.
 class AccessibilityHit {
   AccessibilityHit({
     required this.description,
@@ -127,26 +126,26 @@ class AccessibilityHit {
   final bool hasFocusInterest;
   final int depth;
 
-  /// Widget creation location from the inspector (`file` URI + line), when available (debug/profile).
+  /// Creation location: `file` URI + line (debug/profile when the VM sends it).
   final String? sourceFileUri;
   final int? sourceLine;
   final int? sourceColumn;
 
-  /// One or more **heuristic** WCAG-oriented suggestions for this widget (grouped on one row).
+  /// Heuristic WCAG-style hints; multiple can share one row.
   final List<SemanticGapHint>? semanticGapHints;
 
-  /// Structural / best-practice warnings (nested [MergeSemantics], risky [ExcludeSemantics], etc.).
+  /// Structural warnings (MergeSemantics, ExcludeSemantics, etc.).
   final List<SemanticWarning>? semanticWarnings;
 
-  /// True when this row includes at least one semantic-gap hint.
+  /// Row has at least one hint.
   bool get isSemanticSuggestion =>
       semanticGapHints != null && semanticGapHints!.isNotEmpty;
 
-  /// True when this row includes at least one semantic warning.
+  /// Row has at least one warning.
   bool get hasSemanticWarnings =>
       semanticWarnings != null && semanticWarnings!.isNotEmpty;
 
-  /// Combined suggestion text for tooltips and detail panels (multiple hints separated by a rule).
+  /// All hint messages joined for tooltips / detail.
   String? get semanticSuggestion {
     if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
     return semanticGapHints!
@@ -154,13 +153,13 @@ class AccessibilityHit {
         .join(kAccessibilityHintSeparator);
   }
 
-  /// First hint’s WCAG level (for simple chip rows); use [semanticGapHints] for all.
+  /// First hint’s WCAG level; full list in [semanticGapHints].
   String? get wcagLevel => semanticGapHints?.first.wcagLevel;
 
   /// First hint’s criterion id.
   String? get wcagCriterionId => semanticGapHints?.first.criterionId;
 
-  /// First hint’s short criterion name.
+  /// First hint’s criterion title.
   String? get wcagCriterionName => semanticGapHints?.first.criterionName;
 
   bool get isInteresting =>
@@ -169,7 +168,7 @@ class AccessibilityHit {
       isSemanticSuggestion ||
       hasSemanticWarnings;
 
-  /// One-line WCAG badge for chips, e.g. `A · 1.1.1` or `A · 1.1.1 (+2 more)`.
+  /// Compact chip text, e.g. `A · 1.1.1` or `A · 1.1.1 (+2 more)`.
   String? get wcagBadgeCompact {
     if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
     final first = semanticGapHints!.first;
@@ -179,7 +178,7 @@ class AccessibilityHit {
     return '$base (+$extra more)';
   }
 
-  /// Long tooltip for WCAG row (handbook + official spec).
+  /// Long tooltip for the WCAG row.
   String? get wcagTooltipDetail {
     if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
     final buf = StringBuffer();
@@ -236,8 +235,7 @@ String _shortenInspectorFileUri(String fileUri) {
   return parts.isEmpty ? fileUri : parts.last;
 }
 
-/// Walks Flutter inspector JSON (`getRootWidgetTree`) for semantics- and focus-related widgets,
-/// plus optional **heuristic** rows when common widgets look like they lack a semantic name/label.
+/// Scans `getRootWidgetTree` JSON: semantics, focus, optional heuristic rows.
 List<AccessibilityHit> scanInspectorTree(
   Map<String, Object?>? root, {
   bool includeSemanticGapHints = true,
@@ -406,10 +404,7 @@ List<AccessibilityHit> scanInspectorTree(
   return out;
 }
 
-/// Best-effort external-source detection for "App only" mode.
-///
-/// Inspector metadata can omit `createdByLocalProject` in some runs/configurations.
-/// In that case we only exclude nodes that are clearly from Flutter SDK or pub cache.
+/// "App only" filter: treat SDK / pub-cache paths as external when `createdByLocalProject` is missing.
 bool _isClearlyExternalInspectorSource(String? fileUri) {
   if (fileUri == null || fileUri.isEmpty) return false;
   final lower = fileUri.toLowerCase();
@@ -424,11 +419,7 @@ bool _isExcludeSemanticsWidget(String type, String description) {
       description.contains('ExcludeSemantics');
 }
 
-/// Whether the inspector’s short [description] shows `excludeFromSemantics: true` on **this** widget.
-///
-/// When true, we skip heuristic hints that target this widget’s own semantics (e.g. [GestureDetector]
-/// name/role warnings). **Descendants are unchanged:** child widgets can still contribute semantics;
-/// only this node’s merged semantics are dropped from the semantics tree (see Flutter docs).
+/// True if [description] (or merged property text) contains `excludeFromSemantics: true`.
 bool _inspectorDescriptionShowsExcludeFromSemanticsTrue(String description) {
   if (RegExp(
     r'excludeFromSemantics\s*[:=]\s*true\b',
@@ -445,17 +436,20 @@ bool _isPlainGestureDetectorType(String type) {
   return type == 'GestureDetector' || type.startsWith('GestureDetector');
 }
 
-/// Whether this node effectively excludes its gesture from semantics.
+/// True if this gesture target is excluded from semantics.
 ///
-/// [GestureDetector] does **not** list [excludeFromSemantics] in [debugFillProperties]
-/// (only `startBehavior`); Flutter puts [DiagnosticsProperty] on the built
-/// [RawGestureDetector] child. We must read the child’s inspector line when the parent’s omits it.
+/// [GestureDetector] often omits `excludeFromSemantics` on its summary line; check merged properties
+/// and any [RawGestureDetector] child.
 bool _effectiveExcludeFromSemanticsForGestureDetector(
   Map<String, Object?> node,
   String type,
   String description,
 ) {
-  if (_inspectorDescriptionShowsExcludeFromSemanticsTrue(description)) {
+  final String heuristicText = accessibilityHeuristicInspectorText(
+    node,
+    description,
+  );
+  if (_inspectorDescriptionShowsExcludeFromSemanticsTrue(heuristicText)) {
     return true;
   }
   if (type.contains('RawGestureDetector')) {
@@ -473,8 +467,9 @@ bool _effectiveExcludeFromSemanticsForGestureDetector(
     if (child == null) continue;
     final ct = child['widgetRuntimeType'] as String? ?? '';
     final cd = child['description'] as String? ?? '';
+    final childHeuristicText = accessibilityHeuristicInspectorText(child, cd);
     if (ct.contains('RawGestureDetector') &&
-        _inspectorDescriptionShowsExcludeFromSemanticsTrue(cd)) {
+        _inspectorDescriptionShowsExcludeFromSemanticsTrue(childHeuristicText)) {
       return true;
     }
   }
@@ -1047,7 +1042,7 @@ bool _immediateParentSuppliesSemantics(String? parentType) {
     'CheckboxListTile',
     'RadioListTile',
     'ExpansionTile',
-    // Note: MergeSemantics does not supply a label by itself; do not skip children.
+    // MergeSemantics has no label; still visit children.
   ];
   return materialButtons.any(parentType.contains);
 }
@@ -1063,11 +1058,9 @@ bool _isImageLikeWidget(String type) {
   }
 }
 
-/// Uses the inspector one-line / summary [description] only (not full property expansion).
+/// True when the summary shows no non-empty `semanticLabel`.
 ///
-/// Returns true when there is **no** non-empty `semanticLabel` shown. The inspector
-/// typically omits the property entirely when it is null, so we treat “missing” as
-/// “needs review” unless we see a quoted non-empty label.
+/// Null labels are often left out of the string; that still counts as needing review unless a quoted label appears.
 bool _imageInspectorLacksSemanticLabel(String description) {
   if (description.contains('excludeFromSemantics: true')) {
     return false;
@@ -1200,7 +1193,7 @@ bool _sliderLikelyMissingValueLabel(String type, String description) {
   return true;
 }
 
-/// WCAG 2.1 AAA 2.4.9: generic link text on a tappable [RichText] / [Text] span.
+/// WCAG 2.1 AAA 2.4.9 — generic link text in [RichText] / [Text] spans.
 bool _richTextGenericLinkPurpose(String type, String description) {
   final lower = description.toLowerCase();
   final hasRecognizer =
@@ -1226,7 +1219,7 @@ bool _richTextGenericLinkPurpose(String type, String description) {
   return false;
 }
 
-/// WCAG 2.1 AA 2.4.6: large bold [Text] without heading semantics in the one-line description.
+/// WCAG 2.1 AA 2.4.6 — large bold [Text] without header semantics in the summary.
 bool _textLooksLikeHeadingWithoutHeaderSemantics(
   String type,
   String description,
@@ -1257,7 +1250,7 @@ bool _textLooksLikeHeadingWithoutHeaderSemantics(
   return hasBold && large;
 }
 
-/// WCAG 2.1 AA 2.4.7: focus ring effectively removed via transparent focusColor.
+/// WCAG 2.1 AA 2.4.7 — focus ring hidden (transparent focusColor).
 bool _focusIndicatorLikelyHidden(String type, String description) {
   const interactive = <String>[
     'InkWell',
@@ -1277,7 +1270,7 @@ bool _focusIndicatorLikelyHidden(String type, String description) {
   return false;
 }
 
-/// WCAG 2.1 AAA 2.5.5: very small hit target suggested by inspector summary.
+/// WCAG 2.1 AAA 2.5.5 — very small hit target in the summary.
 bool _touchTargetLikelyTooSmall(
   String type,
   String description,
