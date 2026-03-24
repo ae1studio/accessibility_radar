@@ -2,7 +2,7 @@ name: accessibility_radar
 description: "DevTools extension for Flutter: live widget-tree scan for semantics and focus, plus WCAG-oriented hints and warnings."
 homepage: https://github.com/ae1studio/accessibility_radar
 
-version: 0.2.1
+version: 0.2.2
 
 environment:
   sdk: ^3.11.1

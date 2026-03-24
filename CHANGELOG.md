@@ -1,3 +1,7 @@
+## V0.2.2
+
+- Fix GestureDetector excludeFromSemantics detections.
+
 ## V0.2.1
 
 - Added Github repo link to pub.dev
