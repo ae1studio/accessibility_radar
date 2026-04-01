@@ -735,6 +735,29 @@ List<SemanticGapHint> _collectSemanticGapHints({
     );
   }
 
+  if (_controlLikelyMissingAccessibleName(type, heuristicText)) {
+    appendUnique(
+      out,
+      SemanticGapHint(
+        message:
+            '${where}This Material or Cupertino input control appears to rely on an icon-only or placeholder-only presentation and the inspector summary shows no tooltip, label, or semantic label. '
+            'Controls such as IconButton, FloatingActionButton, CupertinoButton, Switch, Checkbox, Radio, and their Cupertino equivalents should expose a clear accessible name via tooltip, semanticLabel, labelText, or an enclosing Semantics/ListTile widget.'
+            '${_hintDartExample('IconButton(\n'
+            '  icon: const Icon(Icons.menu),\n'
+            '  tooltip: \'Open navigation menu\',\n'
+            '  onPressed: openMenu,\n'
+            ')\n'
+            '\n'
+            '// Or wrap a CupertinoButton or Switch:\n'
+            '// Semantics(label: \'Close dialog\', button: true, child: CupertinoButton(...))\n'
+            '// Semantics(label: \'Enable notifications\', toggled: isOn, child: Switch(...))')}',
+        wcagLevel: 'A',
+        criterionId: '4.1.2',
+        criterionName: 'Name, Role, Value',
+      ),
+    );
+  }
+
   return out;
 }
 
@@ -1189,6 +1212,52 @@ bool _sliderLikelyMissingValueLabel(String type, String description) {
   if (RegExp(r'label:\s*"[^"]+"').hasMatch(description)) return false;
   if (RegExp(r"label:\s*'[^']+'").hasMatch(description)) return false;
   return true;
+}
+
+bool _controlLikelyMissingAccessibleName(String type, String description) {
+  const controlTypes = <String>[
+    'IconButton',
+    'FloatingActionButton',
+    'CupertinoButton',
+    'Switch',
+    'Checkbox',
+    'Radio',
+    'CupertinoSwitch',
+    'CupertinoCheckbox',
+    'CupertinoRadio',
+    'CupertinoSlider',
+    'CupertinoTextField',
+  ];
+  if (!controlTypes.any(type.contains)) {
+    return false;
+  }
+  final lower = description.toLowerCase();
+  if (lower.contains('excludefromsemantics: true')) {
+    return false;
+  }
+  if (lower.contains('tooltip:')) {
+    return false;
+  }
+  if (_hasNonEmptySemanticLabelInDescription(description)) {
+    return false;
+  }
+  if (_hasNonEmptyTextChildInDescription(description)) {
+    return false;
+  }
+  return true;
+}
+
+bool _hasNonEmptyTextChildInDescription(String description) {
+  final RegExp pattern = RegExp(
+    "Text\\s*\\(\\s*(['\\\"])([^'\\\"]+)\\1",
+    caseSensitive: false,
+  );
+  final RegExpMatch? textMatch = pattern.firstMatch(description);
+  if (textMatch == null) {
+    return false;
+  }
+  final String value = (textMatch.group(2) ?? '').trim();
+  return value.isNotEmpty;
 }
 
 /// WCAG 2.1 AAA 2.4.9 — generic link text in [RichText] / [Text] spans.
