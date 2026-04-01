@@ -1,4 +1,4 @@
-import 'package:accessibility_radar/src/features/radar/domain/tree_scanner.dart';
+import 'package:accessibility_radar/src/core/accessibility_types.dart';
 import 'package:flutter/material.dart';
 
 class HitTile extends StatelessWidget {

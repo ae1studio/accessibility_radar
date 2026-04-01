@@ -1,89 +1,5 @@
-/// WCAG 2.1 fields for a [SemanticGapHint].
-class SemanticGapHint {
-  const SemanticGapHint({
-    required this.message,
-    required this.wcagLevel,
-    required this.criterionId,
-    required this.criterionName,
-  });
-
-  /// Full suggestion text shown in the UI.
-  final String message;
-
-  /// Conformance level: `A`, `AA`, or `AAA` (WCAG 2.1).
-  final String wcagLevel;
-
-  /// Success criterion number, e.g. `1.1.1`.
-  final String criterionId;
-
-  /// Short criterion title, e.g. `Non-text Content`.
-  final String criterionName;
-
-  /// Tooltip / screen reader line.
-  String get wcagFullLabel =>
-      'WCAG 2.1 Level $wcagLevel: $criterionId $criterionName';
-}
-
-const String kAccessibilityHintSeparator = '\n\n***\n\n';
-
-class SemanticWarning {
-  const SemanticWarning({required this.shortLabel, required this.message});
-
-  /// Short title for list chips / compact UI.
-  final String shortLabel;
-
-  /// Full explanation for the detail panel.
-  final String message;
-}
-
-const String kAccessibilityHintExampleSeparator = '\n\nExample:\n';
-
-/// Extra inspector text from [ext.flutter.inspector.getProperties]; the tree summary often omits `properties`.
-const String kAccessibilityInspectorPropertyTextKey =
-    'accessibilityRadar.inspectorPropertyText';
-
-/// Walks getProperties JSON and appends descriptions into one string.
-String flattenInspectorPropertyDescriptions(Object? raw) {
-  final StringBuffer buf = StringBuffer();
-  void walk(Object? node) {
-    if (node is Map) {
-      final Object? desc = node['description'];
-      if (desc is String && desc.isNotEmpty) {
-        buf.writeln(desc);
-      }
-      final Object? props = node['properties'];
-      if (props is List) {
-        for (final Object? p in props) {
-          walk(p);
-        }
-      }
-    } else if (node is List) {
-      for (final Object? p in node) {
-        walk(p);
-      }
-    }
-  }
-  if (raw is List) {
-    for (final Object? p in raw) {
-      walk(p);
-    }
-  } else {
-    walk(raw);
-  }
-  return buf.toString().trimRight();
-}
-
-String accessibilityHeuristicInspectorText(
-  Map<String, Object?> inspectorNode,
-  String nodeDescription,
-) {
-  final Object? extra =
-      inspectorNode[kAccessibilityInspectorPropertyTextKey];
-  if (extra is! String || extra.isEmpty) {
-    return nodeDescription;
-  }
-  return '$nodeDescription\n$extra';
-}
+import 'package:accessibility_radar/src/core/accessibility_types.dart';
+import 'package:accessibility_radar/src/core/inspector_utils.dart';
 
 ({String prose, String? dartExample}) splitAccessibilityHintMessage(
   String text,
@@ -96,143 +12,6 @@ String accessibilityHeuristicInspectorText(
   );
 }
 
-/// One row in the scan results.
-class AccessibilityHit {
-  AccessibilityHit({
-    required this.description,
-    required this.widgetRuntimeType,
-    required this.valueId,
-    required this.hasSemanticsInterest,
-    required this.hasFocusInterest,
-    required this.depth,
-    this.sourceFileUri,
-    this.sourceLine,
-    this.sourceColumn,
-    this.semanticGapHints,
-    this.semanticWarnings,
-  }) : assert(
-         semanticGapHints == null || semanticGapHints.isNotEmpty,
-         'Use null instead of an empty hint list.',
-       ),
-       assert(
-         semanticWarnings == null || semanticWarnings.isNotEmpty,
-         'Use null instead of an empty warning list.',
-       );
-
-  final String description;
-  final String widgetRuntimeType;
-  final String? valueId;
-  final bool hasSemanticsInterest;
-  final bool hasFocusInterest;
-  final int depth;
-
-  /// Creation location: `file` URI + line (debug/profile when the VM sends it).
-  final String? sourceFileUri;
-  final int? sourceLine;
-  final int? sourceColumn;
-
-  /// Heuristic WCAG-style hints; multiple can share one row.
-  final List<SemanticGapHint>? semanticGapHints;
-
-  /// Structural warnings (MergeSemantics, ExcludeSemantics, etc.).
-  final List<SemanticWarning>? semanticWarnings;
-
-  /// Row has at least one hint.
-  bool get isSemanticSuggestion =>
-      semanticGapHints != null && semanticGapHints!.isNotEmpty;
-
-  /// Row has at least one warning.
-  bool get hasSemanticWarnings =>
-      semanticWarnings != null && semanticWarnings!.isNotEmpty;
-
-  /// All hint messages joined for tooltips / detail.
-  String? get semanticSuggestion {
-    if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
-    return semanticGapHints!
-        .map((h) => h.message)
-        .join(kAccessibilityHintSeparator);
-  }
-
-  /// First hint’s WCAG level; full list in [semanticGapHints].
-  String? get wcagLevel => semanticGapHints?.first.wcagLevel;
-
-  /// First hint’s criterion id.
-  String? get wcagCriterionId => semanticGapHints?.first.criterionId;
-
-  /// First hint’s criterion title.
-  String? get wcagCriterionName => semanticGapHints?.first.criterionName;
-
-  bool get isInteresting =>
-      hasSemanticsInterest ||
-      hasFocusInterest ||
-      isSemanticSuggestion ||
-      hasSemanticWarnings;
-
-  /// Compact chip text, e.g. `A · 1.1.1` or `A · 1.1.1 (+2 more)`.
-  String? get wcagBadgeCompact {
-    if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
-    final first = semanticGapHints!.first;
-    final base = '${first.wcagLevel} · ${first.criterionId}';
-    final extra = semanticGapHints!.length - 1;
-    if (extra <= 0) return base;
-    return '$base (+$extra more)';
-  }
-
-  /// Long tooltip for the WCAG row.
-  String? get wcagTooltipDetail {
-    if (semanticGapHints == null || semanticGapHints!.isEmpty) return null;
-    final buf = StringBuffer();
-    for (final h in semanticGapHints!) {
-      buf.writeln(
-        'WCAG 2.1 Level ${h.wcagLevel}: ${h.criterionId} ${h.criterionName}.',
-      );
-    }
-    buf.write('See the APPT handbook and WCAG 2.1 when fixing issues.');
-    return buf.toString();
-  }
-
-  /// Short label for lists, e.g. `lib/main.dart:42` or `package:my_app/foo.dart:10`.
-  String? get sourceLocationLabel {
-    if (sourceFileUri == null || sourceLine == null) return null;
-    return formatCreationLocationLabel(
-      sourceFileUri!,
-      sourceLine!,
-      column: sourceColumn,
-    );
-  }
-}
-
-String? formatCreationLocationLabel(String fileUri, int line, {int? column}) {
-  final path = _shortenInspectorFileUri(fileUri);
-  if (path.isEmpty) return null;
-  final col = column != null ? ':$column' : '';
-  return '$path:$line$col';
-}
-
-String _shortenInspectorFileUri(String fileUri) {
-  try {
-    final uri = Uri.parse(fileUri);
-    if (uri.scheme == 'file' || uri.scheme.isEmpty) {
-      final segments = uri.pathSegments;
-      if (segments.isEmpty) return fileUri;
-      final libIdx = segments.indexOf('lib');
-      if (libIdx >= 0 && libIdx < segments.length - 1) {
-        return segments.sublist(libIdx).join('/');
-      }
-      if (segments.length >= 2) {
-        return '${segments[segments.length - 2]}/${segments.last}';
-      }
-      return segments.last;
-    }
-    if (uri.scheme == 'package') {
-      final p = uri.path;
-      return p.startsWith('/') ? p.substring(1) : p;
-    }
-  } catch (_) {}
-  final parts = fileUri.split(RegExp(r'[/\\]'));
-  return parts.isEmpty ? fileUri : parts.last;
-}
-
 /// Scans `getRootWidgetTree` JSON: semantics, focus, optional heuristic rows.
 List<AccessibilityHit> scanInspectorTree(
   Map<String, Object?>? root, {
@@ -241,7 +20,7 @@ List<AccessibilityHit> scanInspectorTree(
   bool filterToLocalProject = false,
 }) {
   if (root == null) return const [];
-  final out = <AccessibilityHit>[];
+  final List<AccessibilityHit> out = <AccessibilityHit>[];
   void visit(
     Map<String, Object?> node,
     int depth, {
@@ -249,58 +28,62 @@ List<AccessibilityHit> scanInspectorTree(
     required String? parentWidgetType,
     required int mergeSemanticsAncestorCount,
   }) {
-    final desc = node['description'] as String? ?? '';
-    final type = node['widgetRuntimeType'] as String? ?? '';
-    final valueId = node['valueId'] as String?;
-    final loc = _parseCreationLocation(node['creationLocation']);
-    final createdByLocalProject = node['createdByLocalProject'] == true;
-    final sourceFileUri = loc?.$1;
+    final String desc = node['description'] as String? ?? '';
+    final String type = node['widgetRuntimeType'] as String? ?? '';
+    final String? valueId = node['valueId'] as String?;
+    final (String, int, int?)? loc =
+        _parseCreationLocation(node['creationLocation']);
+    final bool createdByLocalProject = node['createdByLocalProject'] == true;
+    final String? sourceFileUri = loc?.$1;
 
-    final inExcludedSubtree = excludeSemanticsDepth > 0;
-    var childExcludeDepth = excludeSemanticsDepth;
+    final bool inExcludedSubtree = excludeSemanticsDepth > 0;
+    int childExcludeDepth = excludeSemanticsDepth;
     if (_isExcludeSemanticsWidget(type, desc)) {
       childExcludeDepth++;
     }
 
-    final sem = _semanticsMatch(type, desc);
-    final focus = _focusMatch(type, desc);
+    final bool sem = _semanticsMatch(type, desc);
+    final bool focus = _focusMatch(type, desc);
 
-    final includeNode =
+    final bool includeNode =
         !filterToLocalProject ||
         createdByLocalProject ||
         !_isClearlyExternalInspectorSource(sourceFileUri);
 
-    final hints = includeSemanticGapHints && !inExcludedSubtree && includeNode
-        ? _collectSemanticGapHints(
-            inspectorNode: node,
-            type: type,
-            description: desc,
-            parentWidgetType: parentWidgetType,
-            sourceLocationLabel: loc != null
-                ? formatCreationLocationLabel(loc.$1, loc.$2, column: loc.$3)
-                : null,
-          )
-        : <SemanticGapHint>[];
+    final List<SemanticGapHint> hints =
+        includeSemanticGapHints && !inExcludedSubtree && includeNode
+            ? _collectSemanticGapHints(
+                inspectorNode: node,
+                type: type,
+                description: desc,
+                parentWidgetType: parentWidgetType,
+                sourceLocationLabel: loc != null
+                    ? formatCreationLocationLabel(
+                        loc.$1,
+                        loc.$2,
+                        column: loc.$3,
+                      )
+                    : null,
+              )
+            : <SemanticGapHint>[];
 
-    final warnings =
+    final List<SemanticWarning> warnings =
         includeSemanticWarnings && !inExcludedSubtree && includeNode
-        ? _collectSemanticWarnings(
-            inspectorNode: node,
-            type: type,
-            description: desc,
-            mergeSemanticsAncestorCount: mergeSemanticsAncestorCount,
-            parentWidgetType: parentWidgetType,
-          )
-        : <SemanticWarning>[];
+            ? _collectSemanticWarnings(
+                inspectorNode: node,
+                type: type,
+                description: desc,
+                mergeSemanticsAncestorCount: mergeSemanticsAncestorCount,
+                parentWidgetType: parentWidgetType,
+              )
+            : <SemanticWarning>[];
 
-    final isMerge = _isMergeSemanticsWidgetType(type);
-    final mergeForChildren = mergeSemanticsAncestorCount + (isMerge ? 1 : 0);
+    final bool isMerge = _isMergeSemanticsWidgetType(type);
+    final int mergeForChildren =
+        mergeSemanticsAncestorCount + (isMerge ? 1 : 0);
 
-    final gestureDetectorExcludeSemanticsFound =
-        includeNode &&
-        !inExcludedSubtree &&
-        _isPlainGestureDetectorType(type) &&
-        _effectiveExcludeFromSemanticsForGestureDetector(node, type, desc);
+    final bool gestureDetectorExcludeSemanticsFound =
+        includeNode && !inExcludedSubtree && _isPlainGestureDetectorType(type);
 
     if ((sem || focus) && includeNode) {
       out.add(
