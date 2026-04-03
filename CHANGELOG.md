@@ -1,3 +1,7 @@
+## V0.3.0
+
+- Added hints for Material and Cupertino input controls (IconButton, FloatingActionButton, CupertinoButton, Switch, Checkbox, Radio, Cupertino variants, etc.)
+
 ## V0.2.2
 
 - Fix GestureDetector excludeFromSemantics detections.
